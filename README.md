@@ -34,14 +34,15 @@ To run the project locally:
 git clone https://github.com/Saankhi/ReactNativeDemoApp
 cd ReactNativeDemoApp
 
-**### 2. Install Dependencies**
+### 2. Install Dependencies
+
 npm install               #using npm
 yarn install              #using yarn
 
-**### 3. Start the app**
+### 3. Start the app
 npx expo start
 
-**### 4. How to Run the App on Your Phone**
+### 4. How to Run the App on Your Phone
  Install **Expo Go** on your phone (iOS/Android)
  Open the Expo Go app and scan the QR code from your terminal or browser
  The app will open instantly on your device
