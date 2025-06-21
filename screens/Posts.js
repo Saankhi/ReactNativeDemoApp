@@ -4,6 +4,7 @@ import { setPostsData } from "../redux/actions";
 import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import Card from "../components/CardComponent";
 import ErrorComponent from "../components/ErrorComponent";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 function Posts() {
@@ -13,17 +14,32 @@ function Posts() {
     const [showIndicator, setShowIndicator] = useState(false);
     const [showSnackbar, setShowSnackbar] = useState(false);
 
+    const [postsNewData,setPostsNewData] = useState([]);
+
     useEffect(() => {
-        if (postsDataArr.length === 0) {
-            setShowIndicator(true);
-            fetchPostsData();             
-        }
-        // fetchPostsData();              -----> When checking for error handling, uncomment this and comment the above function.
+        // if (postsDataArr.length === 0) {
+        //     setShowIndicator(true);
+        //     fetchPostsData();
+        // }
+        fetchPostsData();             
+    }, [])
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+            const data = await getPostsData();
+            setPostsNewData(data);
+        };
+
+        fetchPosts();
     }, [])
 
     const fetchPostsData = async () => {
         try {
-            const res = await fetch('https://jsonplaceholder.typicode.com/posts')
+            /*
+                By providing an incorrect URL, I was able to simulate network failure and 
+                load the POSTS from local storage.
+            */
+            const res = await fetch('https://jsonplaceholder.typicode.com/postssss')
 
             if (!res.ok) {
                 setShowSnackbar(true);
@@ -31,6 +47,9 @@ function Posts() {
             }
             const json = await res.json();
             dispatch(setPostsData(json));
+
+            const jsonValue = JSON.stringify(json);
+            await AsyncStorage.setItem('postsData', jsonValue);
         }
         catch (error) {
             console.log('Error fetching data', error, error.status);
@@ -42,10 +61,20 @@ function Posts() {
 
     }
 
+    const getPostsData = async () => {
+        try {
+            const jsonValue = await AsyncStorage.getItem('postsData');
+            console.log('json value', jsonValue);
+            return jsonValue != null ? JSON.parse(jsonValue) : null;
+        } catch (e) {
+            console.log('error reading value', e)
+        }
+    };
+
     return (
         <View>
             <FlatList
-                data={postsDataArr}
+                data={postsNewData}
                 renderItem={({ item, index }) => {
                     return (
                         <View style={[
